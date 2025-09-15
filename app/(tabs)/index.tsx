@@ -1,75 +1,104 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import CardSlider from '@/components/CardSlider';
+import FeaturedCollections from '@/components/FeaturedCollections';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import HeroBanner from '@/components/HeroBanner';
+import HeroBanner1 from '@/components/HeroBanner1';
+import HeroBanner2 from '@/components/HeroBanner2';
+import HeroSlide from '@/components/HeroSlide';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import 'setimmediate';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { API_URL, DEBUG_MODE } from "@env";
 
-export default function HomeScreen() {
+
+const HomeScreen = () => {
+
+
+    console.log("API URL:", API_URL);
+    console.log("Debug Mode:", DEBUG_MODE);
+  const sampleProducts = [
+    { 
+      id: '1', 
+      name: 'Áo thun thể thao Pro Active', 
+      price: '199.000đ',
+      originalPrice: '249.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/July2023/v2.53.jpg'
+    },
+    { 
+      id: '2', 
+      name: 'Quần short nam thể thao 5"', 
+      price: '179.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/June2023/new.55.jpg'
+    },
+    { 
+      id: '3', 
+      name: 'Áo Polo thể thao Pique', 
+      price: '299.000đ',
+      originalPrice: '349.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/September2023/polo-the-thao-pique-cool-xanh-reu-2.jpg'
+    },
+    { 
+      id: '4', 
+      name: 'Quần dài Kaki Excool', 
+      price: '499.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/October2023/quan-dai-kaki-excool-v2-xanh-dam-2.jpg'
+    },
+    { 
+      id: '5', 
+      name: 'Combo 3 Quần lót nam Trunk Cotton', 
+      price: '199.000đ',
+      originalPrice: '249.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/March2024/24.000001.jpg'
+    },
+    { 
+      id: '6', 
+      name: 'Áo khoác gió thể thao Essentials 2 lớp', 
+      price: '399.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/February2024/Ao-khoac-the-thao-nam-2-lop-xanh-navy-1-copy.jpg'
+    },
+    { 
+      id: '7', 
+      name: 'Áo Sơ mi dài tay Cafe-denim', 
+      price: '399.000đ',
+      originalPrice: '499.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/September2022/ao-so-mi-cafe-xam-xanh-1-1.jpg'
+    },
+    { 
+      id: '8', 
+      name: 'Tất thể thao cổ cao', 
+      price: '49.000đ',
+      image: 'https://media.coolmate.me/cdn-cgi/image/width=672,height=990,quality=85,format=auto/uploads/December2023/v2.12.jpg'
+    },
+  ];
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <Header/>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <HeroBanner />
+        <CardSlider/>
+        <HeroBanner1 />
+        <HeroBanner2 />
+        <FeaturedCollections/>
+        <HeroSlide/>
+        {/* <CategoryList /> {/* <-- Sử dụng component */}
+        {/* <PromotionalBanners/> */}
+        {/* <ProductGrid title="Coolmate's Choice" products={sampleProducts} />
+        <ProductGrid title="Bán Chạy Nhất" products={sampleProducts.slice(0, 2)} />  */}
+        <Footer /> {/* <-- Sử dụng component */}
+      </ScrollView>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
 });
+
+export default HomeScreen;
