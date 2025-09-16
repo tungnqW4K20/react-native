@@ -231,16 +231,14 @@ const Header: React.FC = () => {
               <Icon name="person-outline" size={25} color="#000" />
             </TouchableOpacity>
           )}
-
-
-
-        <TouchableOpacity>
+          
+        <TouchableOpacity onPress={handleNavigateToCart}>
           <Icon name="lock-closed-outline" size={25} color="#000" />
-          <TouchableOpacity onPress={handleNavigateToCart}>
+          {/* <TouchableOpacity > */}
             <View style={styles.cartBadge}>
               <Text style={styles.cartBadgeText}>0</Text>
             </View>
-          </TouchableOpacity>
+          {/* </TouchableOpacity> */}
         </TouchableOpacity>
       </View>
 

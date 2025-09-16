@@ -378,7 +378,8 @@ const styles = StyleSheet.create({
     borderTopColor: '#f0f0f0',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    paddingBottom: 24 
+    paddingBottom: 24,
+    marginBottom: 64 
     },
   shippingInfo: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   shippingText: { marginLeft: 8, fontSize: 12, color: '#555' },

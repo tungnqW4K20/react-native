@@ -332,6 +332,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         padding: 16,
         marginTop: 10,
+        marginBottom: 70
     },
     logoutButtonText: {
         fontSize: 16,
