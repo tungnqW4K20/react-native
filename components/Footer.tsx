@@ -30,7 +30,6 @@ const AccordionItem: FC<AccordionItemProps> = ({ title, children }) => {
 const Footer: FC = () => {
   return (
     <View style={styles.container}>
-      {/* Contact Section */}
       <View style={styles.contactSection}>
         <View style={styles.contactRow}>
           <Ionicons name="call-outline" size={24} color="white" />
@@ -78,19 +77,19 @@ const Footer: FC = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialIconWrapper} onPress={() => Linking.openURL('https://www.tiktok.com/@yody.vn')}>
           <Image
-            source={{ uri: 'https://sf-tb-sg.ibytedtos.com/obj/eden-sg/uhty7lpsk/tiktok-icon.png' }} // TikTok icon
+            source={{ uri: 'https://sf-tb-sg.ibytedtos.com/obj/eden-sg/uhty7lpsk/tiktok-icon.png' }} 
             style={styles.socialIconImage}
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialIconWrapper} onPress={() => Linking.openURL('https://www.youtube.com/c/YODYVietNamOfficial')}>
           <Image
-            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' }} // YouTube icon
+            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png' }}
             style={styles.socialIconImage}
           />
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialIconWrapper} onPress={() => Linking.openURL('https://www.instagram.com/yody.vn/')}>
           <Image
-            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/174/174855.png' }} // Instagram icon
+            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/174/174855.png' }} 
             style={styles.socialIconImage}
           />
         </TouchableOpacity>
@@ -111,13 +110,11 @@ const Footer: FC = () => {
         </View>
       </View>
       
-      {/* Accordion Links */}
       <AccordionItem title="HỆ THỐNG CỬA HÀNG" />
       <AccordionItem title="MUA SẮM" />
       <AccordionItem title="DỊCH VỤ KHÁCH HÀNG" />
       <AccordionItem title="VỀ YODY" />
 
-      {/* Company Info */}
       <View style={styles.companyInfoSection}>
         <Text style={styles.companyText}>© CÔNG TY CỔ PHẦN THỜI TRANG YODY</Text>
         <Text style={styles.companyText}>
@@ -125,13 +122,11 @@ const Footer: FC = () => {
         </Text>
       </View>
 
-      {/* Badges */}
       <View style={styles.badgesContainer}>
-        <Image source={{ uri: 'https://www.dmca.com/img/dmca_protected_200.png' }} style={styles.badge} /> {/* DMCA badge */}
-        <Image source={{ uri: 'https://images.dmca.com/badges/byr_ssl_small.png' }} style={styles.badge} /> {/* Example BCT badge - you might need a specific URL for the actual BCT badge */}
+        <Image source={{ uri: 'https://www.dmca.com/img/dmca_protected_200.png' }} style={styles.badge} /> 
+        <Image source={{ uri: 'https://images.dmca.com/badges/byr_ssl_small.png' }} style={styles.badge} /> 
       </View>
 
-      {/* "Danh mục" button removed as it was not part of the initial component's visual, and likely a separate fixed element. */}
     </View>
   );
 };

@@ -1,136 +1,112 @@
+import { API_URL } from "@env";
+import { useRouter } from 'expo-router'; // <--- THÊM MỚI: Import useRouter
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
-const { width } = Dimensions.get('window');
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Định nghĩa một interface cho đối tượng category để code an toàn và dễ đọc hơn
 interface Category {
   id: number;
   name: string;
   image_url: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
 }
-
-
 
 const CardSlider = () => {
   const [data, setData] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // <--- THÊM MỚI: Khởi tạo router
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response =await fetch(`https://benodejs-9.onrender.com/api/categories`);
+        const response = await fetch(`${API_URL}/categories`);
         const json = await response.json();
-        
         if (json.success && Array.isArray(json.data)) {
           setData(json.data);
-        } else {
-          setError(json.message || 'Lấy dữ liệu không thành công');
         }
       } catch (e) {
-        setError('Đã có lỗi xảy ra. Vui lòng thử lại.');
         console.error(e);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
+  // const handleCategoryPress = (categoryId: number) => {
+  //   router.push({
+  //     pathname: '/shop', 
+  //     params: { categoryId: categoryId },
+  //   });
+  // };
+    const handleCategoryPress = (categoryId: number) => {
+        router.push({
+          pathname: "/shop",
+          params: { categoryId: categoryId.toString() }, 
+        });
+      };
 
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text>{error}</Text>
-      </View>
-    );
+  if (loading) {
+    return <ActivityIndicator style={{ marginVertical: 30 }} size="large" color="#555" />;
   }
 
   return (
-    <View>
-        <View>
-            <Text style={styles.textTitle}>BỘ SƯU TẬP 2025</Text>
-        </View>
-         <View style={styles.container}>
-            <FlatList
-                data={data}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                snapToAlignment="center"
-                decelerationRate="fast"
-                renderItem={({ item }) => (
-                <View style={styles.card}>
-                  <Image
-                    source={{
-                      uri: item.image_url
-                    }}
-                    style={styles.image}
-                    onError={() => console.log('Không load được ảnh:', item.image_url)}
-                  />
-                  <Text style={styles.title}>{item.name}</Text>
-                </View>
-
-                )}
-            />
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.id.toString()}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <TouchableOpacity 
+            style={styles.categoryItem} 
+            onPress={() => handleCategoryPress(item.id)}
+          >
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: item.image_url }} style={styles.image} />
             </View>
+            <Text style={styles.title} numberOfLines={1}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
+  container: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+  },
+  categoryItem: {
+    alignItems: 'center',
+    width: 80,
+    marginRight: 12,
+  },
+  imageWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: '#EFEFEF',
     justifyContent: 'center',
     alignItems: 'center',
-    
-  },
-  container: {
-    marginTop: 20,
-    marginBottom: 12,
-  },
-  card: {
-    width: width * 0.8,
-    marginHorizontal: 10,
-    backgroundColor: '#fff',
-    borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-    alignItems: 'center',
-    paddingBottom: 10,
-  },
-  title: {
-    fontWeight: '700',
-    fontSize: 16,
-    marginTop: 10,
+    marginBottom: 8,
   },
   image: {
     width: '100%',
-    height: width * 1.0,
+    height: '100%',
     resizeMode: 'cover',
   },
-  textTitle:{
-      textAlign: 'center',
-      marginTop: 50,
-      fontSize: 20,
-      lineHeight: 32,
-      fontWeight: '700',
-  }
+  title: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#333',
+    textAlign: 'center',
+  },
 });
 
 export default CardSlider;

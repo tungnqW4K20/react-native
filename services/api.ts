@@ -1,10 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
+import { API_URL } from "@env";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+// const BASE_URL = 'https://benodejs-9.onrender.com/api'
 
-const BASE_URL = 'https://benodejs-9.onrender.com/api'
-
-// const BASE_URL = 'http://localhost:3000/api'
-
+const BASE_URL = API_URL
+console.log("BASE_URL", BASE_URL)
 let isRefreshing = false
 let subscribers: ((token: string) => void)[] = []
 
@@ -15,7 +15,8 @@ function onRefreshed(token: string) {
 }
 
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: 'https://benodejs-9.onrender.com/api',
+  // baseURL: 'http://localhost:3000/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

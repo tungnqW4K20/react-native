@@ -9,6 +9,7 @@ const AccordionItem: React.FC<PropsWithChildren<{ title: string }>> = ({ title, 
         <View style={styles.accordionContainer}>
             <TouchableOpacity style={styles.accordionHeader} onPress={() => setIsExpanded(!isExpanded)}>
                 <Text style={styles.accordionTitle}>{title}</Text>
+                {/* @ts-ignore */}
                 <Icon name={isExpanded ? "remove-circle-outline" : "add-circle-outline"} size={22} color="#333"/>
             </TouchableOpacity>
             {isExpanded && <View style={styles.accordionContent}>{children}</View>}
@@ -27,10 +28,12 @@ const ProductInfoSections: React.FC<Props> = ({ description }) => {
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>YODY CAM KẾT</Text>
         <View style={styles.commitmentItem}>
+          {/* @ts-ignore */}
             <Icon name="car-outline" size={24} color="#555" />
             <Text style={styles.commitmentText}>Giao trong 3-5 ngày và freeship đơn từ 498k</Text>
         </View>
         <View style={styles.commitmentItem}>
+          {/* @ts-ignore */}
             <Icon name="swap-horizontal-outline" size={24} color="#555" />
             <Text style={styles.commitmentText}>Đổi trả trong vòng 15 ngày</Text>
         </View>
@@ -49,6 +52,7 @@ const ProductInfoSections: React.FC<Props> = ({ description }) => {
       {/* Store Locator */}
       <TouchableOpacity style={styles.storeLocator}>
         <Text style={styles.accordionTitle}>Xem cửa hàng còn sản phẩm</Text>
+        {/* @ts-ignore */}
         <Icon name="chevron-forward-outline" size={22} color="#333"/>
       </TouchableOpacity>
     </View>

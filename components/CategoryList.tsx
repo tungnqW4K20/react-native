@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Dữ liệu mẫu cho các danh mục
+
 interface ICategory {
   id: string;
   name: string;
@@ -63,7 +63,6 @@ const CategoryList = () => {
         contentContainerStyle={styles.scrollViewContent}
       >
         {currentProducts?.map((category) => (
-          // Không cần View categorygrid ở đây, TouchableOpacity là đủ
           <TouchableOpacity key={category.id} style={styles.categoryItem}>
             <Image source={{ uri: category.image }} style={styles.categoryImage} />
             <Text style={styles.categoryName}>{category.name}</Text>
@@ -79,7 +78,6 @@ const styles = StyleSheet.create({
     marginTop: 25,
     marginBottom: 10,
   },
-  // Styles cho các nút NAM/NỮ
   tabContainer: {
     flexDirection: 'row',
     marginBottom: 20,
@@ -107,21 +105,20 @@ const styles = StyleSheet.create({
   inactiveTabText: {
     color: '#888',
   },
-  // Styles cho ScrollView và các item sản phẩm
   scrollViewContent: {
-    paddingHorizontal: 15, // Dùng paddingHorizontal thay vì paddingLeft để cân đối
+    paddingHorizontal: 15, 
   },
   categoryItem: {
     alignItems: 'center',
-    width: 150, // Chiều rộng của mỗi item
-    marginRight: 15, // Khoảng cách giữa các item
+    width: 150, 
+    marginRight: 15, 
   },
   categoryImage: {
-    width: '100%', // Ảnh chiếm 100% chiều rộng của categoryItem
-    height: 220, // Chiều cao của ảnh
+    width: '100%', 
+    height: 220, 
     borderRadius: 12,
     marginBottom: 10,
-    backgroundColor: '#f5f5f5', // Màu nền chờ tải ảnh
+    backgroundColor: '#f5f5f5', 
   },
   categoryName: {
     fontSize: 14,

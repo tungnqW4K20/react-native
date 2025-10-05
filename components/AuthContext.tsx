@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true); 
+      debugger
 
   // Restore user & token khi app khởi động
   useEffect(() => {
@@ -39,6 +40,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (emailOrUsername: string, password: string) => {
+          debugger
+
     try {
 
       // OLD LOGIN
@@ -49,7 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       //   },
       //   body: JSON.stringify({ emailOrUsername, password }),
       // });
-
+      debugger
+      console.log("-------------",emailOrUsername )
+      console.log("-------------",password )
       const result = await authService.login({emailOrUsername, password})
       // const result = await response.json();
 

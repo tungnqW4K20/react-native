@@ -1,5 +1,5 @@
 import { API_URL } from "@env";
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -16,7 +16,6 @@ import {
 const { width } = Dimensions.get('window');
 const PADDING = 16;
 const CARD_WIDTH = (width - PADDING * 3) / 2;
-// ... (Các interface Category, Product, ApiProduct, ProductCardProps không đổi) ...
 interface Category {
   id: number;
   name: string;
@@ -86,6 +85,7 @@ const ProductCard = ({ product, onPress }: ProductCardProps) => {
 };
 
 const FeaturedProducts = () => {
+  const { categoryId } = useLocalSearchParams<{ categoryId?: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -98,24 +98,26 @@ const FeaturedProducts = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const res =await fetch(`${API_URL}/categories`);
+        const res = await fetch(`${API_URL}/categories`);
         const json = await res.json();
         if (json.success) {
-          const listCate = json.data
-          
+          const listCate = json.data;
           setCategories(listCate);
-          if (listCate.length > 0) {
+
+          if (categoryId) {
+            setSelectedCategory(parseInt(categoryId, 10));
+          } else if (listCate.length > 0) {
             setSelectedCategory(listCate[0].id);
           }
         }
       } catch (error) {
-        console.error('Lỗi khi tải categories:', error);
+        console.error("Lỗi khi tải categories:", error);
       } finally {
         setLoading(false);
       }
     };
     fetchCategories();
-  }, []);
+  }, [categoryId]);
 
   useEffect(() => {
     if (selectedCategory === null) return;
@@ -123,9 +125,7 @@ const FeaturedProducts = () => {
     const fetchProductsByCategory = async () => {
       try {
         setProductsLoading(true);
-        const res = await fetch(
-          `${API_URL}/products/category/${selectedCategory}`
-        );
+        const res = await fetch(`${API_URL}/products/category/${selectedCategory}`);
         const json = await res.json();
 
         if (json.success && Array.isArray(json.data)) {
@@ -136,14 +136,14 @@ const FeaturedProducts = () => {
             image: p.image_url,
             isBestSeller: p.featured,
             soldCount: Math.floor(Math.random() * 5000),
-            colors: ['#2c3e50', '#ffffff', '#e74c3c', '#3498db', '#f1c40f'],
+            colors: ["#2c3e50", "#ffffff", "#e74c3c", "#3498db", "#f1c40f"],
           }));
           setProducts(mappedProducts);
         } else {
           setProducts([]);
         }
       } catch (error) {
-        console.error('Lỗi khi tải products:', error);
+        console.error("Lỗi khi tải products:", error);
         setProducts([]);
       } finally {
         setProductsLoading(false);
@@ -153,11 +153,8 @@ const FeaturedProducts = () => {
     fetchProductsByCategory();
   }, [selectedCategory]);
 
-  // SỬA ĐỔI QUAN TRỌNG: Hàm này chỉ điều hướng, không fetch dữ liệu chi tiết
   const handleProductPress = (productId: string) => {
-    console.log(`Điều hướng đến chi tiết sản phẩm ID: ${productId}`);
-    // Sử dụng đường dẫn động khớp với cấu trúc file `app/(tabs)/product/[id].tsx`
-    router.push(`/productdetail/${productId}` as any);
+    router.push(`/productdetail/${productId}`);
   };
 
   if (loading) {
@@ -172,6 +169,7 @@ const FeaturedProducts = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Sản Phẩm Nổi Bật</Text>
 
+      {/* Thanh chọn danh mục */}
       <View style={styles.chipContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {categories.map((category) => (
@@ -196,6 +194,7 @@ const FeaturedProducts = () => {
         </ScrollView>
       </View>
 
+      {/* Danh sách sản phẩm */}
       {productsLoading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#2c3e50" />
@@ -211,13 +210,11 @@ const FeaturedProducts = () => {
           )}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
           contentContainerStyle={{ paddingHorizontal: PADDING }}
           scrollEnabled={false}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              Chưa có sản phẩm cho danh mục này
-            </Text>
+            <Text style={styles.emptyText}>Chưa có sản phẩm cho danh mục này</Text>
           }
         />
       )}
@@ -225,7 +222,7 @@ const FeaturedProducts = () => {
   );
 };
 
-// ... (Toàn bộ phần styles không thay đổi) ...
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff', paddingVertical: 20 },
   title: {

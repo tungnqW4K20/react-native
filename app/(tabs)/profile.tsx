@@ -20,7 +20,7 @@ interface User {
   id: string | number;
   name: string;
   email: string;
-  address?: string;
+  address?: string
   phone?: string;
 }
 
@@ -86,6 +86,7 @@ const ProfileScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <Text style={styles.headerTitle}>Tài khoản</Text>
         <View style={styles.unauthenticatedContainer}>
+          {/* @ts-ignore */}
           <Icon name="user-x" size={60} color={PALETTE.textSecondary} />
           <Text style={styles.unauthenticatedText}>Vui lòng đăng nhập để xem thông tin</Text>
         </View>
@@ -162,25 +163,30 @@ const ProfileScreen: React.FC = () => {
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Thông tin cá nhân</Text>
                 <TouchableOpacity onPress={() => setIsEditing(true)}>
+                  {/* @ts-ignore */}
                     <Icon name="edit-2" size={20} color={PALETTE.textSecondary}/>
                 </TouchableOpacity>
               </View>
               <View style={styles.infoRow}>
+                {/* @ts-ignore */}
                 <Icon name="user" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Họ tên</Text>
                 <Text style={styles.infoValue}>{user.name}</Text>
               </View>
               <View style={styles.infoRow}>
+                {/* @ts-ignore */}
                 <Icon name="mail" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Email</Text>
                 <Text style={styles.infoValue}>{user.email}</Text>
               </View>
               <View style={styles.infoRow}>
+                {/* @ts-ignore */}
                 <Icon name="phone" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Điện thoại</Text>
                 <Text style={styles.infoValue}>{user.phone || "Chưa cập nhật"}</Text>
               </View>
               <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+                {/* @ts-ignore */}
                 <Icon name="map-pin" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Địa chỉ</Text>
                 <Text style={styles.infoValue} numberOfLines={1}>{user.address || "Chưa cập nhật"}</Text>
@@ -191,14 +197,22 @@ const ProfileScreen: React.FC = () => {
               <View style={styles.sectionHeader}>
                  <Text style={styles.sectionTitle}>Quản lý đơn hàng</Text>
               </View>
-              <TouchableOpacity style={styles.infoRow}>
+              <TouchableOpacity style={styles.infoRow} onPress={ () => {
+                console.log("----------")
+                router.push("/order-history"); 
+              }}>
+                {/* @ts-ignore */}
                 <Icon name="package" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Lịch sử mua hàng</Text>
+                {/* @ts-ignore */}
                 <Icon name="chevron-right" style={styles.chevronIcon} />
+
               </TouchableOpacity>
               <TouchableOpacity style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+                {/* @ts-ignore */}
                 <Icon name="truck" style={styles.infoIcon} />
                 <Text style={styles.infoLabel}>Theo dõi đơn hàng</Text>
+                {/* @ts-ignore */}
                 <Icon name="chevron-right" style={styles.chevronIcon} />
               </TouchableOpacity>
             </View>
@@ -210,6 +224,7 @@ const ProfileScreen: React.FC = () => {
                     router.push("/login"); 
                 }}
                 >
+                  {/* @ts-ignore */}
                 <Icon name="log-out" size={20} color={PALETTE.danger} />
                 <Text style={styles.logoutButtonText}>Đăng xuất</Text>
             </TouchableOpacity>
@@ -226,6 +241,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: PALETTE.background,
+        marginBottom: 16
     },
     header: {
         padding: 20,

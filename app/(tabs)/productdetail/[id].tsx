@@ -59,6 +59,7 @@ export default function ProductDetailScreen() {
     const fetchProductDetails = async () => {
       setLoading(true);
       setError(null);
+      console.log("URL", API_URL)
       try {
         const response = await fetch(`${API_URL}/products/${id}/details`);
         const result = await response.json();
@@ -94,6 +95,7 @@ export default function ProductDetailScreen() {
         ? details.color.image_urls[0]
         : product?.image_url;
 
+        console.log("product---------------", details )
       try {
         const data = await cartService.addToCart({
       product_id: product?.id!,

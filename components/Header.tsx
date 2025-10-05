@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// Định nghĩa kiểu dữ liệu cho  một danh mục
 interface Category {
   id: number;
   name: string;
@@ -14,14 +13,12 @@ interface Category {
   deletedAt: string | null;
 }
 
-// Định nghĩa kiểu dữ liệu cho các danh mục đã được phân loại
 interface CategorizedData {
   men: Category[];
   women: Category[];
   sports: Category[];
 }
 
-// Định nghĩa kiểu cho các tab đang hoạt động
 type ActiveTab = 'NAM' | 'NỮ' | 'THỂ THAO';
 
 const menData = {
@@ -37,7 +34,7 @@ const Header: React.FC = () => {
   const [searchVisible, setSearchVisible] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('NAM');
   const [categories, setCategories] = useState<CategorizedData>({ men: [], women: [], sports: [] });
-
+  const [searchValue, setSearchValue] = useState('')
   const router = useRouter();
   const { user } = useAuth();
 
@@ -97,7 +94,7 @@ const Header: React.FC = () => {
     if (activeTab === 'NAM') {
         return (
             <ScrollView>
-                <Image source={{ uri: 'https://n7media.coolmate.me/uploads/August2025/2.9_menu_mobile_nam.jpg' }} style={styles.bannerImage} />
+                <Image source={{ uri: 'https://i.postimg.cc/RFqZMcrp/a55b2d09-d456-432a-bb94-409a54f76327.png' }} style={styles.bannerImage} />
                 <TouchableOpacity style={styles.exploreButton}>
                     <Text style={styles.exploreButtonText}>KHÁM PHÁ ĐỒ NAM</Text>
                 </TouchableOpacity>
@@ -127,7 +124,7 @@ const Header: React.FC = () => {
     if (activeTab === 'NỮ') {
         return (
             <ScrollView>
-                 <Image source={{ uri: 'https://n7media.coolmate.me/uploads/August2025/2.9_menu_mobile_nu.jpg' }} style={styles.bannerImage} />
+                 <Image source={{ uri: 'https://i.postimg.cc/zB1YQKzh/0395b8aa-29a3-4bb5-8dac-1a69fc31bb23.png' }} style={styles.bannerImage} />
                 <TouchableOpacity style={styles.exploreButton}>
                     <Text style={styles.exploreButtonText}>KHÁM PHÁ ĐỒ NỮ</Text>
                 </TouchableOpacity>
@@ -157,7 +154,7 @@ const Header: React.FC = () => {
     if (activeTab === 'THỂ THAO') {
        return (
            <ScrollView>
-                 <Image source={{ uri: 'https://n7media.coolmate.me/uploads/April2025/mceclip6_98.jpg' }} style={styles.bannerImage} />
+                 <Image source={{ uri: 'https://i.postimg.cc/5tBR6GVD/e87f614f-1508-4cfb-98dc-d236ccd95dd3.png' }} style={styles.bannerImage} />
                  <View style={styles.menuSection}>
                     <Text style={styles.menuSectionTitle}>THỂ THAO NAM</Text>
                     {categories.sports.map((item) => (
@@ -177,17 +174,26 @@ const Header: React.FC = () => {
     <View style={styles.searchContainer}>
         <View style={styles.searchHeader}>
             <View style={styles.searchInputContainer}>
+                {/* @ts-ignore */}
                 <Icon name="search-outline" size={22} color="#888" />
-                <TextInput placeholder="Tìm kiếm..." style={styles.searchInput} />
+                <TextInput placeholder="Tìm kiếm..." style={styles.searchInput}
+                value={searchValue}
+                onChangeText={setSearchValue}
+                 returnKeyType="search"
+                onSubmitEditing={() => handleSearchSubmit(searchValue)}
+                />
             </View>
             <TouchableOpacity onPress={() => setSearchVisible(false)}>
-                 <Icon name="close-outline" size={30} color="#000" />
+              {/* @ts-ignore */}
+                 <Icon name="close-outline" size={30} color="#000" /> 
             </TouchableOpacity>
         </View>
         <Text style={styles.searchTitle}>Từ khóa nổi bật ngày hôm nay</Text>
         <View style={styles.keywordContainer}>
             {['Áo thun', 'Quần Shorts', 'Áo Polo', 'Áo khoác'].map(keyword => (
-                <TouchableOpacity key={keyword} style={styles.keywordChip}>
+                <TouchableOpacity key={keyword} style={styles.keywordChip}
+                onPress={() => handleSearchSubmit(keyword)}
+                >
                     <Text>{keyword}</Text>
                 </TouchableOpacity>
             ))}
@@ -201,13 +207,23 @@ const Header: React.FC = () => {
   );
 
 
+  const handleSearchSubmit = (query: string) => {
+  if (query.trim()) {
+    setSearchValue(''); 
+    setSearchVisible(false); 
+    
+    router.push(`/shopbyfind?search=${encodeURIComponent(query.trim())}`);
+  }
+};
   return (
     <View>
       <View style={styles.mainHeader}>
         <TouchableOpacity onPress={() => setMenuVisible(true)}>
+          {/* @ts-ignore */}
           <Icon name="menu-outline" size={30} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setSearchVisible(true)}>
+          {/* @ts-ignore */}
           <Icon name="search-outline" size={25} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleNavigateToHome}>
@@ -228,11 +244,13 @@ const Header: React.FC = () => {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity onPress={handleNavigateToLogin}>
+              {/* @ts-ignore */}
               <Icon name="person-outline" size={25} color="#000" />
             </TouchableOpacity>
           )}
           
         <TouchableOpacity onPress={handleNavigateToCart}>
+          {/* @ts-ignore */}
           <Icon name="lock-closed-outline" size={25} color="#000" />
           {/* <TouchableOpacity > */}
             <View style={styles.cartBadge}>
@@ -251,10 +269,12 @@ const Header: React.FC = () => {
         <View style={styles.modalContainer}>
              <View style={styles.modalHeader}>
                 <TouchableOpacity onPress={() => setMenuVisible(false)}>
+                    {/* @ts-ignore */}
                     <Icon name="close-outline" size={30} color="#000" />
                 </TouchableOpacity>
             </View>
             <View style={styles.searchInMenu}>
+                  {/* @ts-ignore */}
                  <Icon name="search-outline" size={22} color="#888" />
                  <TextInput placeholder="Tìm kiếm..." style={styles.searchInput} />
             </View>

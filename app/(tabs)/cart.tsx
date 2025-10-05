@@ -1,14 +1,18 @@
 import { useAuth } from '@/components/AuthContext';
 import Header from '@/components/Header';
 import { cartService } from '@/services/cartService';
+import { orderService } from '@/services/orderService'; // Thêm import
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-
 interface CartItem {
   id: number;
+  productId: number;
+  colorProductId: number;
+  sizeProductId: number;
   name: string;
   variant: string;
   price: number;
@@ -17,12 +21,12 @@ interface CartItem {
   selected: boolean;
 }
 
-
 export default function CartScreen() {
   const { token } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectAll, setSelectAll] = useState(true);
+  const router = useRouter();
 
   const formatCurrency = (amount: number) => {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
@@ -30,79 +34,43 @@ export default function CartScreen() {
 
   const totalPrice = items.reduce((sum, item) => item.selected ? sum + item.price * item.quantity : sum, 0);
 
-  // const fetchCart = async () => {
-  //   if (!token) return;
-
-  //   try {
-  //     setLoading(true);
-  //     // const res = await fetch(`${API_URL}/api/carts`, {
-  //     //   method: 'GET',
-  //     //   headers: { Authorization: `Bearer ${token}` },
-  //     // });
-  //     const res = await cartService.getCart()
-  //     console.log("res", res)
-  //     if (res.success){
-  //             console.log("res", res.data)
-
-  //       const data =  res.data;
-  //       const cartItems: CartItem[] = data.map((item: any) => ({
-  //         id: item.id,
-  //         name: item.product.name,
-  //         variant: `${item.colorVariant.name}, ${item.sizeVariant.name}`,
-  //         price: Number(item.colorVariant.price) || 0,
-  //         quantity: item.quantity,
-  //         image: item.colorVariant?.image_urls?.[0] || item.product.image_url,
-  //         selected: true,
-  //       }));
-  //       setItems(cartItems);
-  //       setSelectAll(cartItems.every(item => item.selected));
-  //     } else {
-        
-  //       console.error('Lỗi khi lấy giỏ hàng');
-  //     }
-  //   } catch (err) {
-  //     console.error('Lỗi fetch giỏ hàng:', err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const fetchCart = async () => {
-  if (!token) return;
+    if (!token) return;
 
-  try {
-    setLoading(true);
-    const res = await cartService.getCart()
-    console.log("res", res)
+    try {
+      setLoading(true);
+      const res = await cartService.getCart()
 
-    if (res.success) {
-      const data = res.data;
+      if (res.success) {
+        const data = res.data;
 
-      const cartItems: CartItem[] = data.map((item: any) => ({
-        id: item.id,
-        name: item.product.name,
-        variant: `${item.colorVariant.name}, ${item.sizeVariant.name}`,
-        price:
-          (Number(item.product.price) || 0) +
-          (Number(item.colorVariant?.price) || 0) +
-          (Number(item.sizeVariant?.price) || 0),
-        quantity: item.quantity,
-        image: item.colorVariant?.image_urls?.[0] || item.product.image_url,
-        selected: true,
-      }));
+        const cartItems: CartItem[] = data.map((item: any) => ({
+          id: item.id,
+          productId: item.product_id,
+          colorProductId: item.color_product_id,
+          sizeProductId: item.size_product_id,
+          name: item.product.name,
+          variant: `${item.colorVariant.name}, ${item.sizeVariant.name}`,
+          price:
+            (Number(item.product.price) || 0) +
+            (Number(item.colorVariant?.price) || 0) +
+            (Number(item.sizeVariant?.price) || 0),
+          quantity: item.quantity,
+          image: item.colorVariant?.image_urls?.[0] || item.product.image_url,
+          selected: true,
+        }));
 
-      setItems(cartItems);
-      setSelectAll(cartItems.every(item => item.selected));
-    } else {
-      console.error('Lỗi khi lấy giỏ hàng');
+        setItems(cartItems);
+        setSelectAll(cartItems.every(item => item.selected));
+      } else {
+        console.error('Lỗi khi lấy giỏ hàng');
+      }
+    } catch (err) {
+      console.error('Lỗi fetch giỏ hàng:', err);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Lỗi fetch giỏ hàng:', err);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -127,60 +95,64 @@ export default function CartScreen() {
 
   const removeItem = async (id: number) => {
     const res = await cartService.deleteCart(id)
-    console.log('res', res)
-    if(res.success){
+    if (res.success) {
       fetchCart();
     };
-    }
-
-  // const changeQuantity = async (id: number, quantity: number, type: string) => {
-  //   // setItems(prev =>
-  //   //   prev.map(item =>
-  //   //     item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-  //   //   )
-  //   // );
-  //   let newQuantity = type === "plus"
-  //     ? quantity + 1
-  //     : type === "minus"
-  //       ? quantity - 1
-  //       : quantity
-  //   console.log("id", id, newQuantity)
-  //   const dataupdateCart = await cartService.updateCart(id, newQuantity)
-  //   console.log("dataupdateCart", dataupdateCart)
-  //   fetchCart();
-
-  // };
-
+  }
 
   const changeQuantity = async (id: number, quantity: number, type: string) => {
-  let newQuantity = type === "plus"
-    ? quantity + 1
-    : type === "minus"
-      ? quantity - 1
-      : quantity;
+    let newQuantity = type === "plus"
+      ? quantity + 1
+      : type === "minus"
+        ? quantity - 1
+        : quantity;
 
-  if (newQuantity < 1) return; // không cho nhỏ hơn 1
+    if (newQuantity < 1) return;
 
-  const res = await cartService.updateCart(id, newQuantity);
-  if (res.success) {
-    setItems(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  } else {
-    console.error("Update thất bại");
-  }
-};
+    const res = await cartService.updateCart(id, newQuantity);
+    if (res.success) {
+      setItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    } else {
+      console.error("Update thất bại");
+    }
+  };
 
-
-  const handleOrder = () => {
+  const handleOrder = async () => {
     const selectedItems = items.filter(item => item.selected);
+
     if (selectedItems.length === 0) {
       Alert.alert('Thông báo', 'Vui lòng chọn sản phẩm để đặt hàng.');
       return;
     }
-    Alert.alert('Đặt hàng', `Bạn đã đặt ${selectedItems.length} sản phẩm, tổng ${formatCurrency(totalPrice)}`);
+
+    const orderItems = selectedItems.map(item => ({
+      productId: item.productId,
+      colorProductId: item.colorProductId,
+      sizeProductId: item.sizeProductId,
+      quantity: item.quantity,
+      imageUrl: item.image,
+    }));
+
+    try {
+      const res = await orderService.createOrder(orderItems);
+      if (res.success) {
+        Alert.alert('Thành công', 'Tạo đơn hàng thành công!');
+        fetchCart();
+        router.push({
+          pathname: '/Invoice',
+          params: { orderData: JSON.stringify(res.data) }
+        });
+      } else {
+        Alert.alert('Lỗi', res.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi tạo đơn hàng:', error);
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+    }
   };
 
   if (loading) {
@@ -228,7 +200,7 @@ export default function CartScreen() {
 
               <View style={styles.priceQuantityRow}>
                 <View style={styles.quantitySelector}>
-                  <TouchableOpacity onPress={() => changeQuantity(item.id, item.quantity, 'minus' )} style={styles.quantityButton}>
+                  <TouchableOpacity onPress={() => changeQuantity(item.id, item.quantity, 'minus')} style={styles.quantityButton}>
                     <Text style={styles.quantityButtonText}>-</Text>
                   </TouchableOpacity>
                   <Text style={styles.quantityText}>{item.quantity}</Text>
@@ -236,7 +208,6 @@ export default function CartScreen() {
                     <Text style={styles.quantityButtonText}>+</Text>
                   </TouchableOpacity>
                 </View>
-                {/* <Text style={styles.productPrice}>{formatCurrency(item.price)}</Text> */}
                 <Text style={styles.productPrice}>
                   {formatCurrency(item.price * item.quantity)}
                 </Text>
@@ -270,7 +241,8 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    marginBottom: 60
      },
   centered: { 
     flex: 1, 
@@ -379,7 +351,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     paddingBottom: 24,
-    marginBottom: 64 
+    marginBottom:0 
     },
   shippingInfo: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   shippingText: { marginLeft: 8, fontSize: 12, color: '#555' },

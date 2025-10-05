@@ -1,37 +1,57 @@
-import { ResizeMode, Video } from 'expo-av'; // 1. Import từ expo-av
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const HeroBanner1 = () => {
   return (
     <View style={styles.container}>
-      {/* Video nền */}
-      <Video
-        source={{ uri: 'https://buggy.yodycdn.com/videos/raw/f92d227154971f2e976c49183e2426ec.mp4' }}
-        style={styles.video}
-        resizeMode={ResizeMode.COVER} // 2. Thay đổi giá trị resizeMode
-        isLooping // 3. Thay 'repeat' bằng 'isLooping'
-        isMuted // 4. Thay 'muted' bằng 'isMuted'
-        shouldPlay // 5. Thay 'paused={false}' bằng 'shouldPlay'
-      />
+      <TouchableOpacity style={styles.card}>
+        <Image 
+          source={{ uri: 'https://buggy.yodycdn.com/images/raw/8ec9c41350fb00545aa7e9c86269fc24.jpeg' }} 
+          style={styles.image} 
+        />
+        {/* <View style={styles.overlay}>
+          <Text style={styles.title}>POLO YODY</Text>
+          <Text style={styles.subtitle}>Thoải mái & Lịch lãm</Text>
+        </View> */}
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width,
-    height: 800,
-    position: 'relative',
+    marginTop: 8,
+    paddingHorizontal: 16,
   },
-  video: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
+  card: {
+    height: 200,
+    borderRadius: 12,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
     width: '100%',
     height: '100%',
+    position: 'absolute',
+  },
+  overlay: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textTransform: 'uppercase',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#fff',
+    marginTop: 4,
   },
 });
 
