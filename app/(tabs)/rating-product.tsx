@@ -1,12 +1,14 @@
 import { orderService } from "@/services/orderService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  Keyboard,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   SafeAreaView,
@@ -15,14 +17,16 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View
 } from "react-native";
 // Giả sử bạn đã cài đặt và cấu hình thư viện date picker
 // import DateTimePicker from '@react-native-community/datetimepicker';
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImageManipulator from "expo-image-manipulator";
 
 // Để chọn ảnh, bạn cần cài đặt thư viện này:
 // import * as ImagePicker from 'expo-image-picker';
-import api from "@/services/api";
 import { commentService } from "@/services/commentService";
 import * as ImagePicker from 'expo-image-picker';
 
@@ -271,8 +275,8 @@ const submitReview = async () => {
 };
   // ===== RENDER FUNCTIONS =====
 
-  const renderProductItem = (p: Product) => (
-    <View key={p.id} style={styles.productRow}>
+  const renderProductItem = (p: Product , index: number) => (
+    <View key={`${p.id}-${index}`} style={styles.productRow}>
       <Image source={{ uri: p.image }} style={styles.thumb} />
       <View style={{ flex: 1, marginLeft: 12 }}>
         <Text numberOfLines={2} style={styles.productTitle}>
@@ -300,7 +304,7 @@ const submitReview = async () => {
         </Text>
       </View>
       <View style={styles.divider} />
-      {item.items.map(renderProductItem)}
+      {item.items.map((p, index) => renderProductItem(p, index))}
       {/* <View style={styles.divider} /> */}
      
        <View style={styles.actionRow}>
@@ -376,7 +380,9 @@ const submitReview = async () => {
         visible={isReviewModalVisible}
         onRequestClose={() => setReviewModalVisible(false)}
     >
-        <Pressable style={styles.modalBackdrop} onPress={() => setReviewModalVisible(false)}/>
+        {/* <Pressable style={styles.modalBackdrop} onPress={() => setReviewModalVisible(false)}/> */}
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Đánh giá sản phẩm</Text>
@@ -433,6 +439,8 @@ const submitReview = async () => {
             <Text style={styles.submitButtonText}>Gửi đánh giá</Text>
           </TouchableOpacity>
         </View>
+          </TouchableWithoutFeedback>
+
     </Modal>
   );
 
@@ -455,20 +463,30 @@ const submitReview = async () => {
     return;
   }
 
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsMultipleSelection: true, 
-    quality: 1,
-  });
+  // let result = await ImagePicker.launchImageLibraryAsync({
+  //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //   // mediaTypes: [ImagePicker.MediaType.image],
+  //   allowsMultipleSelection: true, 
+  //   quality: 1,
+  // });
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+  mediaTypes: ImagePicker.MediaTypeOptions.Images, // ⚠️ vẫn dùng tạm thời
+  allowsMultipleSelection: true,
+  quality: 1,
+});
 
 
-  if (!result.canceled) {
-    const uri = result.assets[0].uri
-    const image_url = await uploadImageToServer(uri)
-    // setReviewImages(prev => [...prev, ...result.assets.map(a => a.uri)]);
-    setReviewImages(prev => [...prev, image_url]);
-  }
+  if (!result.canceled && result.assets?.length > 0) {
+  const uploadedUrls = await Promise.all(
+    result.assets.map(async (asset) => {
+      const image_url = await uploadImageToServer(asset.uri);
+      return image_url;
+    })
+  );
+  setReviewImages((prev) => [...prev, ...uploadedUrls]);
 };
+}
 
 // const uploadImageToServer = async (uri: string) => {
 //   // Chuyển uri thành blob
@@ -489,19 +507,145 @@ const submitReview = async () => {
 // };
 
 /// NEW
+// const uploadImageToServer = async (uri: string) => {
+//   const res = await fetch(uri)
+//   const blob = await res.blob()
+
+//   const formData = new FormData()
+//   formData.append("productImage", blob, `review_${Date.now()}.jpg`)
+
+//   const response = await api.post("/uploads/product-image", formData, {
+//     headers: { "Content-Type": "multipart/form-data" },
+//   })
+
+//   return response.data?.data?.imageUrl
+// }
+
+// const uploadImageToServer = async (uri: string) => {
+//   try {
+//     let realUri = uri;
+//     console.log("uri", uri)
+//     // ✅ Fix cho iPhone: convert ph:// → file:// để fetch() đọc được
+//     if (Platform.OS === "ios" && uri.startsWith("ph://")) {
+//       const manipulated = await ImageManipulator.manipulateAsync(
+//         uri,
+//         [],
+//         {
+//           compress: 1, // giữ nguyên chất lượng
+//           format: ImageManipulator.SaveFormat.JPEG, // lưu file thật
+//         }
+//       );
+//       realUri = manipulated.uri;
+//     }
+
+//     // ✅ Fetch ảnh thành blob
+//     const res = await fetch(realUri);
+//     const blob = await res.blob();
+
+//     // ✅ Kiểm tra blob rỗng
+//     if (!blob || blob.size === 0) {
+//       throw new Error("Ảnh trống hoặc không thể đọc blob (Empty file).");
+//     }
+
+//     // ✅ Chuẩn bị FormData gửi lên backend
+//     const formData = new FormData();
+//     formData.append("productImage", blob, `review_${Date.now()}.jpg`);
+
+//     // ✅ Gửi request POST như cũ
+//     const response = await api.post("/uploads/product-image", formData, {
+//       headers: { "Content-Type": "multipart/form-data" },
+//     });
+
+//     // ✅ Trả về link ảnh
+//     return response.data?.data?.imageUrl;
+//   } catch (error) {
+//     console.error("❌ Lỗi khi upload ảnh:", error);
+//     throw error;
+//   }
+// };
+
+// const uploadImageToServer = async (uri: string) => {
+//   try {
+//     let realUri = uri;
+//     if (Platform.OS === "ios" && uri.startsWith("ph://")) {
+//       const manipulated = await ImageManipulator.manipulateAsync(uri, [], {
+//         compress: 1,
+//         format: ImageManipulator.SaveFormat.JPEG,
+//       });
+//       realUri = manipulated.uri;
+//     }
+
+//     const res = await fetch(realUri);
+//     const blob = await res.blob();
+
+//     if (!blob || blob.size === 0) {
+//       throw new Error("Ảnh trống hoặc không thể đọc blob (Empty file).");
+//     }
+
+//     const formData = new FormData();
+//     formData.append("productImage", blob, `review_${Date.now()}.jpg`);
+
+//     // ✅ Dùng fetch thay vì axios
+//     const response = await fetch("https://benodejs-9.onrender.com/api/uploads/product-image", {
+//       method: "POST",
+//       body: formData,
+//       headers: {
+//         Accept: "application/json",
+//       },
+//     });
+
+//     const data = await response.json();
+//     console.log("✅ Upload success:", data);
+//     return data?.data?.imageUrl;
+//   } catch (error) {
+//     console.error("❌ Lỗi khi upload ảnh:", error);
+//     throw error;
+//   }
+// };
+
 const uploadImageToServer = async (uri: string) => {
-  const res = await fetch(uri)
-  const blob = await res.blob()
+  try {
+    let realUri = uri;
 
-  const formData = new FormData()
-  formData.append("productImage", blob, `review_${Date.now()}.jpg`)
+    // Fix iOS: chuyển từ ph:// sang file:// bằng expo-image-manipulator
+    if (Platform.OS === "ios" && uri.startsWith("ph://")) {
+      const manipulated = await ImageManipulator.manipulateAsync(uri, [], {
+        compress: 1,
+        format: ImageManipulator.SaveFormat.JPEG,
+      });
+      realUri = manipulated.uri;
+    }
 
-  const response = await api.post("/uploads/product-image", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  })
+    // ✅ Đọc file thành base64
+    const base64Data = await FileSystem.readAsStringAsync(realUri, {
+      encoding: "base64",
+    });
 
-  return response.data?.data?.imageUrl
-}
+    const formData = new FormData();
+    formData.append("productImage", {
+      uri: realUri,
+      name: `review_${Date.now()}.jpg`,
+      type: "image/jpeg",
+    } as any);
+
+    // ✅ Gửi request bằng fetch
+    const response = await fetch("https://benodejs-9.onrender.com/api/uploads/product-image", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("✅ Upload response:", data);
+    if (data?.success === false) throw new Error(data?.message || "Upload failed");
+    return data?.data?.imageUrl;
+  } catch (error) {
+    console.error("❌ Lỗi khi upload ảnh:", error);
+    throw error;
+  }
+};
   return (
     <SafeAreaView style={styles.container}>
       {renderHeader()}
@@ -521,28 +665,55 @@ const uploadImageToServer = async (uri: string) => {
       
       {selectedTab !== 'delivered' && renderDateFilter()}
 
-      <FlatList
-        data={selectedTab === 'delivered' ? purchasedProducts : filteredOrders}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => selectedTab === 'delivered' 
-            ? <PurchasedProductCard item={item as Product} />
-            : <OrderCard item={item as Order} />
-        }
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16 }}
-        ListEmptyComponent={() => (
-          <View style={styles.centered}>
-             <Image source={{ uri: 'https://cdn.divineshop.vn/static/4e0db8ffb1e967528da41fac2dddf52a.svg' }} style={{width: 120, height: 120, opacity: 0.8}} />
-            <Text style={{ color: MUTED, fontSize: 16, marginTop: 16 }}>
-              {selectedTab === 'delivered' 
-                ? "Bạn chưa có sản phẩm nào đã mua" 
-                : "Không tìm thấy đơn hàng phù hợp"}
-            </Text>
-          </View>
-        )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
-        }
-      />
+      {selectedTab === 'delivered' ? (
+  <FlatList<Product>
+    data={purchasedProducts}
+    keyExtractor={(item, index) => `${item.orderId || 'noOrder'}-${item.id}-${index}`}
+
+    renderItem={({ item }) => <PurchasedProductCard item={item} />}
+    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16 }}
+    ListEmptyComponent={() => (
+      <View style={styles.centered}>
+        <Image
+          source={{
+            uri: 'https://cdn.divineshop.vn/static/4e0db8ffb1e967528da41fac2dddf52a.svg',
+          }}
+          style={{ width: 120, height: 120, opacity: 0.8 }}
+        />
+        <Text style={{ color: MUTED, fontSize: 16, marginTop: 16 }}>
+          Bạn chưa có sản phẩm nào đã mua
+        </Text>
+      </View>
+    )}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
+    }
+  />
+) : (
+  <FlatList<Order>
+    data={filteredOrders}
+    keyExtractor={(item, index) => `order-${item.id}-${index}`}
+
+    renderItem={({ item }) => <OrderCard item={item} />}
+    contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16 }}
+    ListEmptyComponent={() => (
+      <View style={styles.centered}>
+        <Image
+          source={{
+            uri: 'https://cdn.divineshop.vn/static/4e0db8ffb1e967528da41fac2dddf52a.svg',
+          }}
+          style={{ width: 120, height: 120, opacity: 0.8 }}
+        />
+        <Text style={{ color: MUTED, fontSize: 16, marginTop: 16 }}>
+          Không tìm thấy đơn hàng phù hợp
+        </Text>
+      </View>
+    )}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
+    }
+  />
+)}
       {renderReviewModal()}
     </SafeAreaView>
   );

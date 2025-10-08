@@ -76,7 +76,9 @@ const LoginScreen = () => {
 
       {/* Đăng ký & Quên mật khẩu */}
       <View style={styles.footer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={ ()=> {
+          router.push("/register")
+        }}>
           <Text style={styles.footerText}>Đăng ký tài khoản</Text>
         </TouchableOpacity>
         <TouchableOpacity>

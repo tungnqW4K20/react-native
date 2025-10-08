@@ -208,10 +208,14 @@ const ProfileScreen: React.FC = () => {
                 <Icon name="chevron-right" style={styles.chevronIcon} />
 
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+              <TouchableOpacity style={[styles.infoRow, { borderBottomWidth: 0 }]}
+               onPress={()=>{
+                router.push("/rating-product")
+               }}
+              >
                 {/* @ts-ignore */}
-                <Icon name="truck" style={styles.infoIcon} />
-                <Text style={styles.infoLabel}>Theo dõi đơn hàng</Text>
+                <Icon name="star" style={styles.infoIcon} />
+                <Text style={styles.infoLabel}>Đánh giá sản phẩm</Text>
                 {/* @ts-ignore */}
                 <Icon name="chevron-right" style={styles.chevronIcon} />
               </TouchableOpacity>

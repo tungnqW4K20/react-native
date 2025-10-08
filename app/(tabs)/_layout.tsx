@@ -41,7 +41,9 @@ export default function TabLayout() {
         <Tabs.Screen name="order-history" options={{ href: null }} />
         <Tabs.Screen name="productdetail/[id]" options={{ href: null }} />
         <Tabs.Screen name="shopbyfind" options={{ href: null }} />
-        {/* <Tabs.Screen name="rating-product" options={{ href: null }} /> */}
+        <Tabs.Screen name="rating-product" options={{ href: null }} /> 
+        <Tabs.Screen name="register" options={{ href: null }} /> 
+        <Tabs.Screen name="payment-success" options={{ href: null }} />
 
 
         {/* --- HIỂN THỊ --- */}

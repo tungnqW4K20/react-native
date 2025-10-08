@@ -1,4 +1,5 @@
 import { orderService } from "@/services/orderService";
+import { paymentService } from "@/services/paymentService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -17,11 +18,16 @@ import {
 
 
 
+
+
+
+
+
   View
 } from "react-native";
 // Giả sử bạn đã cài đặt và cấu hình thư viện date picker
 // import DateTimePicker from '@react-native-community/datetimepicker';
-
+import * as Linking from 'expo-linking';
 
 type Product = {
   id: string;
@@ -107,6 +113,64 @@ export default function OrderHistoryScreen() {
   const [datePickerFor, setDatePickerFor] = useState<'start' | 'end'>('start');
 
 
+   const handlePayment = async (order: Order) => {
+    try {
+      // 1. Gọi API để lấy URL thanh toán
+      console.log(`Đang yêu cầu thanh toán cho đơn hàng ${order.id} với số tiền ${order.total}`);
+      const response = await paymentService.createPaymentUrl(
+        Number(order.id.replace("YODY", "")),
+        order.total
+      );
+
+      if (response && response.data) {
+        // 2. Mở URL trong In-App Browser
+        // const result = await WebBrowser.openBrowserAsync(response.data);
+        await Linking.openURL(response.data);
+        // Sau khi trình duyệt đóng, chúng ta có thể làm mới lại danh sách đơn hàng
+        // để cập nhật trạng thái mới nhất (nếu cần).
+        // Tuy nhiên, cách tốt nhất là lắng nghe từ Deep Link.
+      } else {
+        alert("Không thể tạo yêu cầu thanh toán. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo URL thanh toán:", error);
+      alert("Đã xảy ra lỗi trong quá trình thanh toán.");
+    }
+  };
+
+
+  // Lắng nghe sự kiện quay lại ứng dụng từ Deep Link
+  useEffect(() => {
+    const handleDeepLink = (event: { url: string }) => {
+      const { hostname, path, queryParams } = Linking.parse(event.url);
+      
+      // Kiểm tra nếu URL là từ VNPAY trả về
+      if (hostname === 'payment' && path === 'return') {
+        console.log("Quay lại từ VNPAY:", queryParams);
+        const vnp_ResponseCode = queryParams?.vnp_ResponseCode;
+
+        if (vnp_ResponseCode === '00') {
+           // Bạn có thể hiện một thông báo thành công ở đây
+           alert('Thanh toán thành công!');
+        } else {
+           // Hoặc thông báo thất bại
+           alert('Thanh toán không thành công hoặc đã bị hủy.');
+        }
+
+        // Tải lại danh sách đơn hàng để cập nhật trạng thái mới nhất
+        fetchOrders();
+      }
+    };
+    
+    // Thêm listener
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+
+    // Dọn dẹp listener khi component unmount
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+  
   const fetchOrders = async () => {
     setIsLoading(true);
     try {
@@ -247,7 +311,7 @@ export default function OrderHistoryScreen() {
             >
               <Text style={styles.actionButtonText}>Hủy đơn</Text>
             </Pressable>
-            <Pressable style={[styles.actionButton, styles.primaryButton]} onPress={() => console.log("Thanh toán", item.id)}>
+            <Pressable style={[styles.actionButton, styles.primaryButton]}  onPress={() => handlePayment(item)}>
               <Text style={styles.primaryButtonText}>Thanh toán ngay</Text>
             </Pressable>
           </>
