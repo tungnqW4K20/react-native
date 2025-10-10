@@ -33,20 +33,9 @@ export default function TabLayout() {
             fontWeight: "500",
           },
         }}
+        initialRouteName="index"
       >
-        {/* --- ẨN --- */}
-        <Tabs.Screen name="explore" options={{ href: null }} />
-        <Tabs.Screen name="login" options={{ href: null }} />
-        <Tabs.Screen name="Invoice" options={{ href: null }} />
-        <Tabs.Screen name="order-history" options={{ href: null }} />
-        <Tabs.Screen name="productdetail/[id]" options={{ href: null }} />
-        <Tabs.Screen name="shopbyfind" options={{ href: null }} />
-        <Tabs.Screen name="rating-product" options={{ href: null }} /> 
-        <Tabs.Screen name="register" options={{ href: null }} /> 
-        <Tabs.Screen name="payment-success" options={{ href: null }} />
-
-
-        {/* --- HIỂN THỊ --- */}
+        {/* TAB 1 - SẢN PHẨM */}
         <Tabs.Screen
           name="shop"
           options={{
@@ -57,6 +46,7 @@ export default function TabLayout() {
           }}
         />
 
+        {/* TAB 2 - GIỎ HÀNG */}
         <Tabs.Screen
           name="cart"
           options={{
@@ -67,7 +57,7 @@ export default function TabLayout() {
           }}
         />
 
-        {/* HOME NỔI GIỮA */}
+        {/* TAB 3 - HOME NỔI GIỮA */}
         <Tabs.Screen
           name="index"
           options={{
@@ -84,6 +74,7 @@ export default function TabLayout() {
           }}
         />
 
+        {/* TAB 4 - CÁ NHÂN */}
         <Tabs.Screen
           name="profile"
           options={{
@@ -94,6 +85,7 @@ export default function TabLayout() {
           }}
         />
 
+        {/* TAB 5 - LIÊN HỆ */}
         <Tabs.Screen
           name="contact"
           options={{
@@ -103,6 +95,17 @@ export default function TabLayout() {
             ),
           }}
         />
+
+        {/* --- ẨN --- */}
+        <Tabs.Screen name="explore" options={{ href: null }} />
+        <Tabs.Screen name="login" options={{ href: null }} />
+        <Tabs.Screen name="Invoice" options={{ href: null }} />
+        <Tabs.Screen name="order-history" options={{ href: null }} />
+        <Tabs.Screen name="productdetail/[id]" options={{ href: null }} />
+        <Tabs.Screen name="shopbyfind" options={{ href: null }} />
+        <Tabs.Screen name="rating-product" options={{ href: null }} /> 
+        <Tabs.Screen name="register" options={{ href: null }} /> 
+        <Tabs.Screen name="payment-success" options={{ href: null }} />
 
         
       </Tabs>
