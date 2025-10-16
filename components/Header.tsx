@@ -1,8 +1,9 @@
 import { useAuth } from "@/components/AuthContext";
+import { viewHistoryService } from "@/services/viewHistoryService";
 import { API_URL } from "@env";
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 interface Category {
   id: number;
@@ -37,6 +38,27 @@ const Header: React.FC = () => {
   const [searchValue, setSearchValue] = useState('')
   const router = useRouter();
   const { user } = useAuth();
+  const { token } = useAuth();
+  const [recentViews, setRecentViews] = useState<any[]>([]);
+const [loadingRecent, setLoadingRecent] = useState(false);
+// const API_URL = "http://localhost:3000/api"
+useEffect(() => {
+  if (!token) return;
+
+  const fetchHistory = async () => {
+    setLoadingRecent(true);
+    try {
+      const result = await viewHistoryService.getHistory();
+      if (result.success) setRecentViews(result.data);
+    } catch (err) {
+      console.error('Lỗi khi lấy lịch sử xem:', err);
+    } finally {
+      setLoadingRecent(false);
+    }
+  };
+
+  fetchHistory();
+}, [token]);
 
   useEffect(() => {
 
@@ -44,7 +66,6 @@ const Header: React.FC = () => {
     const fetchCategories = async () => {
       
       try {
-        console.log("API_URL", API_URL)
         const response =await fetch(`${API_URL}/categories`);
         const result: { success: boolean; data: Category[] } = await response.json();
 
@@ -199,10 +220,40 @@ const Header: React.FC = () => {
             ))}
         </View>
         <Text style={styles.searchTitle}>Sản phẩm đã xem gần đây</Text>
-        <View style={styles.recentProduct}>
+        {/* <View style={styles.recentProduct}>
             <Image source={{ uri: 'https://n7media.coolmate.me/uploads/July2025/t-shirt-chay-bo-graphic-energy-1-5-do.jpg' }} style={styles.recentProductImage} />
             <Text style={styles.recentProductText}>Set đồ Áo thun và Quần short thể thao "Tự hào Vi...</Text>
-        </View>
+        </View> */}
+        <View style={styles.recentContainer}>
+  <Text style={styles.recentTitle}>Sản phẩm đã xem gần đây</Text>
+
+  {loadingRecent ? (
+    <ActivityIndicator size="small" color="#000" />
+  ) : recentViews.length === 0 ? (
+    <Text style={styles.emptyText}>Chưa có sản phẩm nào được xem gần đây.</Text>
+  ) : (
+    <FlatList
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      data={recentViews}
+  keyExtractor={(item) => item.product_id.toString()} // ✅ dùng product_id
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          style={styles.recentProduct}
+          onPress={() => router.push(`/product/${item.productId}`)}
+        >
+          <Image
+            source={{ uri: item.product?.image_url }}
+            style={styles.recentProductImage}
+          />
+          <Text numberOfLines={1} style={styles.recentProductText}>
+            {item.product?.name}
+          </Text>
+        </TouchableOpacity>
+      )}
+    />
+  )}
+</View>
     </View>
   );
 
@@ -488,19 +539,46 @@ const styles = StyleSheet.create({
       borderRadius: 20,
       margin: 5,
   },
-  recentProduct: {
-      alignItems: 'center',
-      width: 150,
-  },
-  recentProductImage: {
-      width: 150,
-      height: 220,
-      backgroundColor: '#f0f0f0'
-  },
-  recentProductText: {
-      marginTop: 5,
-      textAlign: 'center'
-  },
+  // recentProduct: {
+  //     alignItems: 'center',
+  //     width: 150,
+  // },
+  // recentProductImage: {
+  //     width: 150,
+  //     height: 220,
+  //     backgroundColor: '#f0f0f0'
+  // },
+  // recentProductText: {
+  //     marginTop: 5,
+  //     textAlign: 'center'
+  // },
+
+  recentContainer: {
+  marginTop: 20,
+},
+recentTitle: {
+  fontWeight: 'bold',
+  fontSize: 18,
+  marginBottom: 10,
+},
+recentProduct: {
+  width: 120,
+  marginRight: 10,
+},
+recentProductImage: {
+  width: 120,
+  height: 120,
+  borderRadius: 10,
+},
+recentProductText: {
+  marginTop: 5,
+  fontSize: 14,
+  color: '#333',
+},
+emptyText: {
+  color: '#777',
+  fontStyle: 'italic',
+},
 });
 
 export default Header;

@@ -47,7 +47,7 @@ export default function InvoiceScreen() {
   useEffect(() => {
     if (params.orderData) {
       try {
-        const parsedData = JSON.parse(params.orderData as string);
+        const parsedData = JSON.parse(params?.orderData as string);
         setOrder(parsedData);
       } catch (error) {
         console.error("Lỗi khi parse dữ liệu đơn hàng:", error);
@@ -81,7 +81,6 @@ export default function InvoiceScreen() {
       <View style={{ width: 40 }} />
     </View>
   );
-
   // Mới: Component hiển thị thông tin giao hàng
   const renderShippingInfo = () => (
     <View style={styles.sectionCard}>
@@ -163,7 +162,7 @@ export default function InvoiceScreen() {
       {renderHeader()}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {renderShippingInfo()} {/* Thêm vào giao diện */}
+        {renderShippingInfo()} 
 
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>Sản phẩm</Text>

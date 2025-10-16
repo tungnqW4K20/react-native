@@ -5,6 +5,7 @@ import ProductGallery from '@/components/ProductGallery';
 import ProductInfoSections from '@/components/ProductInfoSections';
 import ProductReviews from "@/components/ProductReviews";
 import { cartService } from "@/services/cartService";
+import { viewHistoryService } from "@/services/viewHistoryService";
 import { API_URL } from "@env";
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -47,7 +48,7 @@ export default function ProductDetailScreen() {
   const [selectedColor, setSelectedColor] = useState<ApiColorOption | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { token } = useAuth();
+  const { token, user  } = useAuth();
 
   useEffect(() => {
     if (!id) {
@@ -71,6 +72,14 @@ export default function ProductDetailScreen() {
           if (productData.colorOptions && productData.colorOptions.length > 0) {
             setSelectedColor(productData.colorOptions[0]);
           }
+          // Ghi lại lịch sử xem (nếu đã đăng nhập)
+if (token && user && id) {
+  try {
+    await viewHistoryService.addView(Number(id));
+  } catch (err) {
+    console.error("Lỗi khi ghi lịch sử xem:", err);
+  }
+}
         } else {
           setError('Không thể tải dữ liệu sản phẩm.');
         }
