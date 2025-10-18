@@ -60,7 +60,6 @@ export default function ProductDetailScreen() {
     const fetchProductDetails = async () => {
       setLoading(true);
       setError(null);
-      console.log("URL", API_URL)
       try {
         const response = await fetch(`${API_URL}/products/${id}/details`);
         const result = await response.json();
@@ -104,7 +103,6 @@ if (token && user && id) {
         ? details.color.image_urls[0]
         : product?.image_url;
 
-        console.log("product---------------", details )
       try {
         const data = await cartService.addToCart({
       product_id: product?.id!,
@@ -115,7 +113,6 @@ if (token && user && id) {
     });
 
     alert("Thêm sản phẩm vào giỏ hàng thành công!");
-    console.log("Cart item:", data);
       } catch (err) {
         console.error("Lỗi khi thêm sản phẩm vào giỏ:", err);
       }

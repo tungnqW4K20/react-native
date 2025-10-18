@@ -2,16 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios'; // Bạn cần cài đặt thư viện này: npm install axios
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 // --- Bảng màu và Hằng số dựa trên thương hiệu YODY ---
@@ -25,7 +25,6 @@ const BORDER_COLOR = '#EAEAEA';
 const API_ENDPOINT = 'https://benodejs-9.onrender.com/api/customers';
 
 export default function RegisterScreen() {
-  // --- States cho các trường thông tin ---
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -34,12 +33,10 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
-  // --- States cho UI/UX ---
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- Hàm xử lý đăng ký ---
   const handleRegister = async () => {
     // 1. Kiểm tra dữ liệu đầu vào (Validation)
     if (!name || !email || !phone || !address || !username || !password || !confirmPassword) {

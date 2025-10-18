@@ -1,5 +1,4 @@
 import api from '@/services/api';
-import { API_URL } from '@env';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -39,18 +38,14 @@ interface ProductReviewsProps {
 
 const fetchReviewsFromApi = async (productId: number): Promise<Review[]> => {
   try {
-    console.log("check", API_URL)
-    // const response = await fetch(`${API_URL}/comments/product/${productId}`);
-    // const result = await response.json();
+
     const response = await api.get(`/comments/product/${productId}`);
 
-    const result = response.data; // axios tự parse JSON rồi
+    const result = response.data; 
     if (result.success && Array.isArray(result.data)) {
      return result.data.map((item: ApiComment) => {
         const authorName = item.customer?.name || 'Ẩn danh';
         
-        // Tạo URL cho avatar sử dụng ui-avatars.com
-        // encodeURIComponent dùng để mã hóa các ký tự đặc biệt trong tên (ví dụ: dấu cách)
         const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
           authorName
         )}&size=150&background=random&color=fff`;
@@ -95,7 +90,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   useEffect(() => {
     const loadReviews = async () => {
       try {
-        debugger
         setIsLoading(true);
         const fetched = await fetchReviewsFromApi(productId);
         setReviews(fetched);

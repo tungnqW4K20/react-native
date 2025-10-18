@@ -1,5 +1,7 @@
 import { orderService } from "@/services/orderService";
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system/legacy";
+import * as ImageManipulator from "expo-image-manipulator";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -20,13 +22,7 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
-// Giả sử bạn đã cài đặt và cấu hình thư viện date picker
-// import DateTimePicker from '@react-native-community/datetimepicker';
-import * as FileSystem from "expo-file-system/legacy";
-import * as ImageManipulator from "expo-image-manipulator";
 
-// Để chọn ảnh, bạn cần cài đặt thư viện này:
-// import * as ImagePicker from 'expo-image-picker';
 import { commentService } from "@/services/commentService";
 import * as ImagePicker from 'expo-image-picker';
 
@@ -38,13 +34,12 @@ type Product = {
   qty: number;
   price: number;
   image?: string;
-  orderId?: string; // Thêm để biết sản phẩm thuộc đơn hàng nào
-  purchaseDate?: string; // Thêm ngày mua hàng
+  orderId?: string; 
+  purchaseDate?: string; 
 };
 
 type OrderStatus = "pending" | "shipping" | "delivered" | "cancelled";
 
-// Thêm một key mới cho tab sản phẩm đã mua
 type TabKey = OrderStatus | "delivered";
 
 
@@ -66,11 +61,10 @@ const BORDER_COLOR = "#EAEAEA";
 
 const TABS = [
   
-  { key: "delivered", label: "Sản phẩm đã mua" }, // Tab mới
+  { key: "delivered", label: "Sản phẩm đã mua" }, 
 ];
 
 const mapApiOrderToLocalOrder = (apiOrder: any): Order => {
-  console.log("apiOrder", apiOrder)
     const statusMap: { [key: string]: OrderStatus } = {
       "0": "pending",
       "1": "shipping",
@@ -78,7 +72,6 @@ const mapApiOrderToLocalOrder = (apiOrder: any): Order => {
       "3": "cancelled",
     };
     const statusKey = statusMap[apiOrder.orderstatus] || "delivered";
-    console.log("statusKey", statusKey)
     const statusLabelMap: { [key in OrderStatus]: string } = {
       pending: "Chờ xử lý",
       shipping: "Đang giao hàng",
@@ -113,13 +106,11 @@ export default function OrderHistoryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  // State cho việc lọc ngày
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [datePickerFor, setDatePickerFor] = useState<'start' | 'end'>('start');
 
-  // State cho Modal đánh giá
   const [isReviewModalVisible, setReviewModalVisible] = useState(false);
   const [reviewingProduct, setReviewingProduct] = useState<Product | null>(null);
   const [rating, setRating] = useState(0);
@@ -131,11 +122,8 @@ export default function OrderHistoryScreen() {
     setIsLoading(true);
     try {
       const response = await orderService.getPurchaseCustomer();
-      console.log("response", response)
       if (response.success && Array.isArray(response.data)) {
-        console.log("hể")
         const mappedOrders = response.data.map(mapApiOrderToLocalOrder);
-        console.log("mappedOrders", mappedOrders)
         setOrders(mappedOrders);
       }
     } catch (error) {
@@ -151,10 +139,9 @@ export default function OrderHistoryScreen() {
   }, []);
 
   const filteredOrders = useMemo(() => {
-    if (selectedTab === 'delivered') return []; // Không lọc đơn hàng cho tab này
+    if (selectedTab === 'delivered') return []; 
 
     let tempOrders = orders.filter((o) => o.status === selectedTab);
-    console.log("tempOrders", tempOrders)
     if (startDate) {
       const startOfDay = new Date(startDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -170,7 +157,6 @@ export default function OrderHistoryScreen() {
     return tempOrders;
   }, [selectedTab, orders, startDate, endDate]);
 
-  // Tạo danh sách các sản phẩm đã mua từ các đơn hàng đã giao
   const purchasedProducts = useMemo(() => {
     const products: Product[] = [];
     orders.forEach(order => {
@@ -184,7 +170,6 @@ export default function OrderHistoryScreen() {
         });
       }
     });
-    console.log("products", products)
     return products;
   }, [orders]);
 
@@ -216,7 +201,6 @@ export default function OrderHistoryScreen() {
 
   const formatPrice = (v: number) => v.toLocaleString("vi-VN") + "₫";
 
-  // ===== LOGIC CHO REVIEW MODAL =====
   const openReviewModal = (product: Product) => {
     setReviewingProduct(product);
     setRating(0);
@@ -224,26 +208,6 @@ export default function OrderHistoryScreen() {
     setReviewImages([]);
     setReviewModalVisible(true);
   };
-
-  // const pickImage = async () => {
-  //   // Cần quyền truy cập thư viện ảnh
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsMultipleSelection: true,
-  //     quality: 1,
-  //   });
-  //   if (!result.canceled) {
-  //     setReviewImages(prev => [...prev, ...result.assets.map(a => a.uri)]);
-  //   }
-
-  //   // Giả lập chọn ảnh
-  //   const fakeUri = `https://picsum.photos/200/300?random=${Math.random()}`;
-  //   if (reviewImages.length < 5) {
-  //       setReviewImages(prev => [...prev, fakeUri]);
-  //   } else {
-  //       alert("Bạn chỉ có thể tải lên tối đa 5 ảnh.");
-  //   }
-  // };
 
   const handleRemoveImage = (uri: string) => {
     setReviewImages(prev => prev.filter(imageUri => imageUri !== uri));
@@ -259,23 +223,13 @@ const submitReview = async () => {
   };
 
   const data = await commentService.createComment(payload)
-  // const response = await fetch("http://localhost:3000/api/comments", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhLm5ndXllbkBleGFtcGxlLmNvbSIsInVzZXJuYW1lIjoibmd1eWVudmFuYSIsInJvbGUiOiJjdXN0b21lciIsImlhdCI6MTc1OTUwMjk2NSwiZXhwIjoxNzU5NTg5MzY1fQ.MocZH0NEBput04Y3cNC7n8s2UGobn3KH9oLIQUcn2OY`,
-  //   },
-  //   body: JSON.stringify(payload),
-  // });
 
-  // const data = await response.json();
   console.log("Review thành công:", data);
    setReviewModalVisible(false)
     setReviewingProduct(null)
 };
-  // ===== RENDER FUNCTIONS =====
 
-  const renderProductItem = (p: Product , index: number) => (
+  const renderProductItem = (p: Product , index?: number) => (
     <View key={`${p.id}-${index}`} style={styles.productRow}>
       <Image source={{ uri: p.image }} style={styles.thumb} />
       <View style={{ flex: 1, marginLeft: 12 }}>
@@ -332,7 +286,6 @@ const submitReview = async () => {
     </View>
   );
   
-  // Component mới để hiển thị sản phẩm đã mua
   const PurchasedProductCard = ({ item }: { item: Product }) => (
     <View style={styles.card}>
       {renderProductItem(item)}
@@ -456,22 +409,15 @@ const submitReview = async () => {
   }
 
   const pickImage = async () => {
-  // Xin quyền truy cập thư viện ảnh
   const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
   if (status !== 'granted') {
     alert('Ứng dụng cần quyền truy cập thư viện ảnh để chọn hình.');
     return;
   }
 
-  // let result = await ImagePicker.launchImageLibraryAsync({
-  //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //   // mediaTypes: [ImagePicker.MediaType.image],
-  //   allowsMultipleSelection: true, 
-  //   quality: 1,
-  // });
 
   const result = await ImagePicker.launchImageLibraryAsync({
-  mediaTypes: ImagePicker.MediaTypeOptions.Images, // ⚠️ vẫn dùng tạm thời
+  mediaTypes: ImagePicker.MediaTypeOptions.Images, 
   allowsMultipleSelection: true,
   quality: 1,
 });
@@ -488,126 +434,11 @@ const submitReview = async () => {
 };
 }
 
-// const uploadImageToServer = async (uri: string) => {
-//   // Chuyển uri thành blob
-//   const res = await fetch(uri);
-//   const blob = await res.blob();
-
-//   const formData = new FormData();
-//   formData.append("productImage", blob, `review_${Date.now()}.jpg`);
-
-//   const response = await fetch("http://localhost:3000/api/uploads/product-image", {
-//     method: "POST",
-//     body: formData,
-//     headers: { Accept: "application/json" },
-//   });
-
-//   const data = await response.json();
-//   return data?.data?.imageUrl;
-// };
-
-/// NEW
-// const uploadImageToServer = async (uri: string) => {
-//   const res = await fetch(uri)
-//   const blob = await res.blob()
-
-//   const formData = new FormData()
-//   formData.append("productImage", blob, `review_${Date.now()}.jpg`)
-
-//   const response = await api.post("/uploads/product-image", formData, {
-//     headers: { "Content-Type": "multipart/form-data" },
-//   })
-
-//   return response.data?.data?.imageUrl
-// }
-
-// const uploadImageToServer = async (uri: string) => {
-//   try {
-//     let realUri = uri;
-//     console.log("uri", uri)
-//     // ✅ Fix cho iPhone: convert ph:// → file:// để fetch() đọc được
-//     if (Platform.OS === "ios" && uri.startsWith("ph://")) {
-//       const manipulated = await ImageManipulator.manipulateAsync(
-//         uri,
-//         [],
-//         {
-//           compress: 1, // giữ nguyên chất lượng
-//           format: ImageManipulator.SaveFormat.JPEG, // lưu file thật
-//         }
-//       );
-//       realUri = manipulated.uri;
-//     }
-
-//     // ✅ Fetch ảnh thành blob
-//     const res = await fetch(realUri);
-//     const blob = await res.blob();
-
-//     // ✅ Kiểm tra blob rỗng
-//     if (!blob || blob.size === 0) {
-//       throw new Error("Ảnh trống hoặc không thể đọc blob (Empty file).");
-//     }
-
-//     // ✅ Chuẩn bị FormData gửi lên backend
-//     const formData = new FormData();
-//     formData.append("productImage", blob, `review_${Date.now()}.jpg`);
-
-//     // ✅ Gửi request POST như cũ
-//     const response = await api.post("/uploads/product-image", formData, {
-//       headers: { "Content-Type": "multipart/form-data" },
-//     });
-
-//     // ✅ Trả về link ảnh
-//     return response.data?.data?.imageUrl;
-//   } catch (error) {
-//     console.error("❌ Lỗi khi upload ảnh:", error);
-//     throw error;
-//   }
-// };
-
-// const uploadImageToServer = async (uri: string) => {
-//   try {
-//     let realUri = uri;
-//     if (Platform.OS === "ios" && uri.startsWith("ph://")) {
-//       const manipulated = await ImageManipulator.manipulateAsync(uri, [], {
-//         compress: 1,
-//         format: ImageManipulator.SaveFormat.JPEG,
-//       });
-//       realUri = manipulated.uri;
-//     }
-
-//     const res = await fetch(realUri);
-//     const blob = await res.blob();
-
-//     if (!blob || blob.size === 0) {
-//       throw new Error("Ảnh trống hoặc không thể đọc blob (Empty file).");
-//     }
-
-//     const formData = new FormData();
-//     formData.append("productImage", blob, `review_${Date.now()}.jpg`);
-
-//     // ✅ Dùng fetch thay vì axios
-//     const response = await fetch("https://benodejs-9.onrender.com/api/uploads/product-image", {
-//       method: "POST",
-//       body: formData,
-//       headers: {
-//         Accept: "application/json",
-//       },
-//     });
-
-//     const data = await response.json();
-//     console.log("✅ Upload success:", data);
-//     return data?.data?.imageUrl;
-//   } catch (error) {
-//     console.error("❌ Lỗi khi upload ảnh:", error);
-//     throw error;
-//   }
-// };
 
 const uploadImageToServer = async (uri: string) => {
   try {
     let realUri = uri;
 
-    // Fix iOS: chuyển từ ph:// sang file:// bằng expo-image-manipulator
     if (Platform.OS === "ios" && uri.startsWith("ph://")) {
       const manipulated = await ImageManipulator.manipulateAsync(uri, [], {
         compress: 1,
@@ -616,7 +447,6 @@ const uploadImageToServer = async (uri: string) => {
       realUri = manipulated.uri;
     }
 
-    // ✅ Đọc file thành base64
     const base64Data = await FileSystem.readAsStringAsync(realUri, {
       encoding: "base64",
     });
@@ -628,7 +458,6 @@ const uploadImageToServer = async (uri: string) => {
       type: "image/jpeg",
     } as any);
 
-    // ✅ Gửi request bằng fetch
     const response = await fetch("https://benodejs-9.onrender.com/api/uploads/product-image", {
       method: "POST",
       body: formData,
@@ -638,7 +467,6 @@ const uploadImageToServer = async (uri: string) => {
     });
 
     const data = await response.json();
-    console.log("✅ Upload response:", data);
     if (data?.success === false) throw new Error(data?.message || "Upload failed");
     return data?.data?.imageUrl;
   } catch (error) {

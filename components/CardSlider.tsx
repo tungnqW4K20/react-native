@@ -31,12 +31,6 @@ const CardSlider = () => {
     fetchData();
   }, []);
 
-  // const handleCategoryPress = (categoryId: number) => {
-  //   router.push({
-  //     pathname: '/shop', 
-  //     params: { categoryId: categoryId },
-  //   });
-  // };
     const handleCategoryPress = (categoryId: number) => {
         router.push({
           pathname: "/shop",

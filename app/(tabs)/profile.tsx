@@ -198,7 +198,6 @@ const ProfileScreen: React.FC = () => {
                  <Text style={styles.sectionTitle}>Quản lý đơn hàng</Text>
               </View>
               <TouchableOpacity style={styles.infoRow} onPress={ () => {
-                console.log("----------")
                 router.push("/order-history"); 
               }}>
                 {/* @ts-ignore */}

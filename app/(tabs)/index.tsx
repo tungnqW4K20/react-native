@@ -2,7 +2,6 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import 'setimmediate';
 
-import { API_URL, DEBUG_MODE } from "@env";
 
 import CardSlider from '@/components/CardSlider';
 import FeaturedCollections from '@/components/FeaturedCollections';
@@ -14,8 +13,6 @@ import HeroBanner2 from '@/components/HeroBanner2';
 import HeroSlide from '@/components/HeroSlide';
 
 const HomeScreen = () => {
-  console.log("API URL:", API_URL);
-  console.log("Debug Mode:", DEBUG_MODE);
 
   return (
     <View style={styles.container}>

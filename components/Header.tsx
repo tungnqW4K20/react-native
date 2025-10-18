@@ -41,7 +41,6 @@ const Header: React.FC = () => {
   const { token } = useAuth();
   const [recentViews, setRecentViews] = useState<any[]>([]);
 const [loadingRecent, setLoadingRecent] = useState(false);
-// const API_URL = "http://localhost:3000/api"
 useEffect(() => {
   if (!token) return;
 
@@ -236,11 +235,11 @@ useEffect(() => {
       horizontal
       showsHorizontalScrollIndicator={false}
       data={recentViews}
-  keyExtractor={(item) => item.product_id.toString()} // ✅ dùng product_id
+  keyExtractor={(item) => item.product_id.toString()}
       renderItem={({ item }) => (
         <TouchableOpacity
           style={styles.recentProduct}
-          onPress={() => router.push(`/product/${item.productId}`)}
+          onPress={() => router.push(`/productdetail/${item.product_id}`)}
         >
           <Image
             source={{ uri: item.product?.image_url }}

@@ -12,21 +12,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity // Sử dụng TouchableOpacity để có hiệu ứng nhấn rõ hơn
-  ,
-
-
-
-
-
-
-
-
-
+  TouchableOpacity,
   View
 } from "react-native";
-// Giả sử bạn đã cài đặt và cấu hình thư viện date picker
-// import DateTimePicker from '@react-native-community/datetimepicker';
+
 import * as Linking from 'expo-linking';
 
 type Product = {
@@ -104,18 +93,15 @@ export default function OrderHistoryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  // State mới cho việc lọc ngày
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   
-  // State để điều khiển việc hiển thị DatePicker (giả lập)
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [datePickerFor, setDatePickerFor] = useState<'start' | 'end'>('start');
 
 
    const handlePayment = async (order: Order) => {
     try {
-      // 1. Gọi API để lấy URL thanh toán
       console.log(`Đang yêu cầu thanh toán cho đơn hàng ${order.id} với số tiền ${order.total}`);
       const response = await paymentService.createPaymentUrl(
         Number(order.id.replace("YODY", "")),
@@ -123,12 +109,7 @@ export default function OrderHistoryScreen() {
       );
 
       if (response && response.data) {
-        // 2. Mở URL trong In-App Browser
-        // const result = await WebBrowser.openBrowserAsync(response.data);
         await Linking.openURL(response.data);
-        // Sau khi trình duyệt đóng, chúng ta có thể làm mới lại danh sách đơn hàng
-        // để cập nhật trạng thái mới nhất (nếu cần).
-        // Tuy nhiên, cách tốt nhất là lắng nghe từ Deep Link.
       } else {
         alert("Không thể tạo yêu cầu thanh toán. Vui lòng thử lại.");
       }
@@ -139,33 +120,26 @@ export default function OrderHistoryScreen() {
   };
 
 
-  // Lắng nghe sự kiện quay lại ứng dụng từ Deep Link
   useEffect(() => {
     const handleDeepLink = (event: { url: string }) => {
       const { hostname, path, queryParams } = Linking.parse(event.url);
       
-      // Kiểm tra nếu URL là từ VNPAY trả về
       if (hostname === 'payment' && path === 'return') {
         console.log("Quay lại từ VNPAY:", queryParams);
         const vnp_ResponseCode = queryParams?.vnp_ResponseCode;
 
         if (vnp_ResponseCode === '00') {
-           // Bạn có thể hiện một thông báo thành công ở đây
            alert('Thanh toán thành công!');
         } else {
-           // Hoặc thông báo thất bại
            alert('Thanh toán không thành công hoặc đã bị hủy.');
         }
 
-        // Tải lại danh sách đơn hàng để cập nhật trạng thái mới nhất
         fetchOrders();
       }
     };
     
-    // Thêm listener
     const subscription = Linking.addEventListener('url', handleDeepLink);
 
-    // Dọn dẹp listener khi component unmount
     return () => {
       subscription.remove();
     };
@@ -226,10 +200,8 @@ export default function OrderHistoryScreen() {
     setEndDate(null);
   }
 
-  // Hàm này sẽ được gọi khi người dùng chọn ngày từ DatePicker
-  // Bạn cần tích hợp thư viện DatePicker thực tế để hoàn thiện
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false); // Ẩn picker sau khi chọn
+    setShowDatePicker(false);
     if (selectedDate) {
         if (datePickerFor === 'start') {
             setStartDate(selectedDate);
@@ -323,13 +295,10 @@ export default function OrderHistoryScreen() {
           style={[styles.actionButton, styles.primaryButton]} 
           onPress={async () => {
             try {
-              // Giả định rằng "Mua lại" sẽ tạo một đơn hàng mới
-              // Hoặc cập nhật đơn hàng này về trạng thái 'pending'
               await orderService.updateOrderStatus({
                 id: Number(item.id.replace("YODY", "")),
-                status: 'pending', // Chuyển trạng thái về 'chờ xử lý'
+                status: 'pending', 
               });
-              // Tải lại danh sách đơn hàng để cập nhật giao diện
               fetchOrders();
               console.log("Đã yêu cầu mua lại đơn hàng:", item.id);
             } catch (error) {
